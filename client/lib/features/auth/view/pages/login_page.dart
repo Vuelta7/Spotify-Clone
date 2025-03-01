@@ -3,15 +3,17 @@ import 'package:client/features/auth/repositories/auth_remote_repositories.dart'
 import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/features/auth/view/widgets/custom_filed.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -37,16 +39,10 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 'Sign in',
-                style: TextStyle(
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 30),
-              CustomFiled(
-                hintText: 'Email',
-                controller: emailController,
-              ), 
+              CustomFiled(hintText: 'Email', controller: emailController),
               SizedBox(height: 15),
               CustomFiled(
                 hintText: 'Password',
@@ -55,32 +51,39 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 20),
               AuthGradientButton(
-                buttonText: 'Sign in', 
+                buttonText: 'Sign in',
                 onTap: () async {
-                  await AuthRemoteRepositories().login(
+                  final res = await AuthRemoteRepositories().login(
                     email: emailController.text,
                     password: passwordController.text,
                   );
-                }
+
+                  final val = switch (res) {
+                    Left(value: final l) => l,
+                    Right(value: final r) => r,
+                  };
+
+                  print(val);
+                },
               ),
               SizedBox(height: 20),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   Navigator.pushNamed(context, '/signup');
                 },
-                child: RichText(text: 
-                  TextSpan(
+                child: RichText(
+                  text: TextSpan(
                     text: 'Dont\' have an account? ',
                     style: Theme.of(context).textTheme.titleMedium,
                     children: const [
                       TextSpan(
                         text: 'Sign Up',
                         style: TextStyle(
-                        color: Pallete.gradient2,
-                        fontWeight: FontWeight.bold,
+                          color: Pallete.gradient2,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ], 
+                    ],
                   ),
                 ),
               ),
